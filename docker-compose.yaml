@@ -1,0 +1,41 @@
+version: '3.3'
+
+services:
+
+  webtronics:
+    container_name: "webtronics"
+    build:
+      context: .
+    depends_on:
+      - db_webtronics
+    volumes:
+      - ./webtronics:/webtronics
+    environment:
+      - POSTGRES_HOST=db_webtronics
+    ports:
+      - "8088:8088"
+    env_file:
+      - .env
+
+  db_webtronics:
+    image: postgres:14.2-alpine
+    container_name: "db_webtronics"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DBNAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_PORT=${POSTGRES_PORT}
+    env_file:
+      - .env
+    volumes:
+      - db_webtronics_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 100
+    ports:
+      - "5432:5432"
+
+volumes:
+  db_webtronics_postgres_data:
