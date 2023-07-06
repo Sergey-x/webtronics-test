@@ -3,21 +3,12 @@ from api.deps import get_db
 from crud.auth import AuthCRUD
 from fastapi.responses import ORJSONResponse
 from fastapi_jwt_auth import AuthJWT
-from fastapi_jwt_auth.exceptions import AuthJWTException
 from schemas.auth import JWTPair, SignInRequestSchema, SignUpRequestSchema
 from services import check_email_deliverable
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 api_router = fa.APIRouter()
-
-
-def authjwt_exception_handler(request: fa.Request, exc: AuthJWTException):
-    """Exception handler for authjwt"""
-    return ORJSONResponse(
-        status_code=fa.status.HTTP_401_UNAUTHORIZED,
-        content={"detail": "Unauthorized"}
-    )
 
 
 def get_jwt_pair(authorize, subject: int) -> JWTPair:

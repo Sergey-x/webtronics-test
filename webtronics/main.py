@@ -1,7 +1,9 @@
 import fastapi as fa
 from api import api_router
-from api.v1.auth import authjwt_exception_handler
+from api.exc import authjwt_exception_handler, validation_exception_handler
+from db.db import MyDatabase
 from enums import Stages
+from fastapi.exceptions import RequestValidationError
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi_pagination import add_pagination
 from settings import SETTINGS
@@ -31,7 +33,11 @@ def get_app() -> fa.FastAPI:
     # добавление возможности пагинации
     add_pagination(application)
 
+    # применяем миграции при старте сервера
+    application.add_event_handler("startup", MyDatabase.apply_migrations)
+
     application.add_exception_handler(AuthJWTException, authjwt_exception_handler)
+    application.add_exception_handler(RequestValidationError, validation_exception_handler)
 
     return application
 

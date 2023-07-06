@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 from fastapi_pagination.ext.sqlalchemy import paginate
 from models import Post
-from schemas import CreatePostRequestSchema, PostResponseItem, UpdatePostRequestSchema
+from schemas.posts import CreatePostRequestSchema, PostResponseItem, UpdatePostRequestSchema
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoResultFound, OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession

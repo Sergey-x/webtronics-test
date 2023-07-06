@@ -7,7 +7,7 @@ from fastapi.responses import ORJSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_pagination import Page
 from pagination import PostPaginationParams
-from schemas import CreatePostRequestSchema, PostResponseItem, UpdatePostRequestSchema
+from schemas.posts import CreatePostRequestSchema, PostResponseItem, UpdatePostRequestSchema
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
