@@ -1,14 +1,12 @@
 from typing import Annotated
 
 import fastapi as fa
-from api.deps import get_db
 from crud import PostCRUD
 from fastapi.responses import ORJSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_pagination import Page
 from pagination import PostPaginationParams
 from schemas.posts import CreatePostRequestSchema, PostResponseItem, UpdatePostRequestSchema
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 api_router = fa.APIRouter()
@@ -34,10 +32,9 @@ api_router = fa.APIRouter()
 async def get_post_by_id(
         post_id: Annotated[int, fa.Path()],
         authorize: AuthJWT = fa.Depends(),
-        db: AsyncSession = fa.Depends(get_db),
 ):
     """Получить пост с идентификатором `post_id`."""
-    post = await PostCRUD.get_post_by_id(db=db, post_id=post_id)
+    post = await PostCRUD.get_post_by_id(post_id=post_id)
 
     if post is None:
         raise fa.HTTPException(status_code=fa.status.HTTP_404_NOT_FOUND)
@@ -62,11 +59,10 @@ async def get_post_by_id(
     },
 )
 async def get_recent_posts(
-        db: AsyncSession = fa.Depends(get_db),
         params: PostPaginationParams = fa.Depends(),  # noqa
 ):
     """Возвращает несколько последних постов, по умолчанию - 50. Есть пагинация."""
-    posts = await PostCRUD.get_recent_posts(db=db)
+    posts = await PostCRUD.get_recent_posts()
 
     if not posts:
         raise fa.HTTPException(status_code=fa.status.HTTP_400_BAD_REQUEST)
@@ -91,12 +87,11 @@ async def update_message(
         post_id: int,
         post: UpdatePostRequestSchema,
         authorize: AuthJWT = fa.Depends(),
-        db: AsyncSession = fa.Depends(get_db),
 ) -> PostResponseItem:
     """Изменить пост с идентификатором `post_id`."""
     authorize.jwt_required()
     user_id: int = authorize.get_jwt_subject()
-    updated_post: PostResponseItem | None = await PostCRUD.update_post(db=db, post_id=post_id, updated_post=post,
+    updated_post: PostResponseItem | None = await PostCRUD.update_post(post_id=post_id, updated_post=post,
                                                                        author_id=user_id)
     if updated_post is None:
         raise fa.HTTPException(fa.status.HTTP_400_BAD_REQUEST)
@@ -120,13 +115,11 @@ async def update_message(
 async def add_message(
         authorize: AuthJWT = fa.Depends(),
         post: CreatePostRequestSchema = fa.Body(),
-        db: AsyncSession = fa.Depends(get_db),
 ) -> PostResponseItem:
     """Создать пост."""
     authorize.jwt_required()
-
     user_id: int = authorize.get_jwt_subject()
-    created_post: PostResponseItem | None = await PostCRUD.create_post(db=db, new_post_data=post, author_id=user_id)
+    created_post: PostResponseItem | None = await PostCRUD.create_post(new_post_data=post, author_id=user_id)
 
     if created_post is None:
         raise fa.HTTPException(fa.status.HTTP_400_BAD_REQUEST)
@@ -151,12 +144,11 @@ async def add_message(
 async def soft_delete_post(
         post_id: int,
         authorize: AuthJWT = fa.Depends(),
-        db: AsyncSession = fa.Depends(get_db),
 ):
     """Удалить пост с идентификатором `post_id`."""
     authorize.jwt_required()
     user_id: int = authorize.get_jwt_subject()
 
-    deleted_row: int = await PostCRUD.delete_post(db=db, post_id=post_id, author_id=user_id)
+    deleted_row: int = await PostCRUD.delete_post(post_id=post_id, author_id=user_id)
     if deleted_row == 0:
         raise fa.HTTPException(status_code=fa.status.HTTP_400_BAD_REQUEST, detail="Нет указанного объекта")

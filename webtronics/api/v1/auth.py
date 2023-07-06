@@ -1,11 +1,9 @@
 import fastapi as fa
-from api.deps import get_db
 from crud.auth import AuthCRUD
 from fastapi.responses import ORJSONResponse
 from fastapi_jwt_auth import AuthJWT
 from schemas.auth import JWTPair, SignInRequestSchema, SignUpRequestSchema
 from services import check_email_deliverable
-from sqlalchemy.ext.asyncio import AsyncSession
 
 
 api_router = fa.APIRouter()
@@ -26,13 +24,13 @@ def get_jwt_pair(authorize, subject: int) -> JWTPair:
     "/signup",
     response_class=ORJSONResponse,
     response_model=JWTPair,
-    status_code=fa.status.HTTP_200_OK,
+    status_code=fa.status.HTTP_201_CREATED,
     responses={
-        fa.status.HTTP_200_OK: {
-            "description": "Ok",
+        fa.status.HTTP_201_CREATED: {
+            "description": "Successfully registered",
         },
         fa.status.HTTP_400_BAD_REQUEST: {
-            "description": "Not found",
+            "description": "Bad request",
         },
         fa.status.HTTP_500_INTERNAL_SERVER_ERROR: {
             "description": "Error",
@@ -40,7 +38,7 @@ def get_jwt_pair(authorize, subject: int) -> JWTPair:
     },
 )
 async def sign_up(
-        db: AsyncSession = fa.Depends(get_db),
+
         authorize: AuthJWT = fa.Depends(),
         user_creds: SignUpRequestSchema = fa.Body(),
 ) -> JWTPair:
@@ -58,7 +56,7 @@ async def sign_up(
             detail="Invalid email address, use another",
         )
 
-    new_user_id: int | None = await AuthCRUD.sign_up(db=db, user_creds=user_creds)
+    new_user_id: int | None = await AuthCRUD.sign_up(user_creds=user_creds)
     if new_user_id is None:
         raise fa.HTTPException(
             status_code=fa.status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -87,7 +85,6 @@ async def sign_up(
     },
 )
 async def sign_in(
-        db: AsyncSession = fa.Depends(get_db),
         authorize: AuthJWT = fa.Depends(),
         user_creds: SignInRequestSchema = fa.Body(),
 ) -> JWTPair:
@@ -97,7 +94,7 @@ async def sign_in(
     """
 
     # получаем пользователя по имени и паролю
-    user_id: int | None = await AuthCRUD.get_user_id_by_creds(db=db, user_creds=user_creds)
+    user_id: int | None = await AuthCRUD.get_user_id_by_creds(user_creds=user_creds)
 
     if user_id is None:
         raise fa.HTTPException(

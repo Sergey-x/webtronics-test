@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-from db import DeclarativeBase
+from database import DeclarativeBase
 
 from .post import Post
 from .user import User

@@ -2,15 +2,15 @@ import sqlalchemy as sa
 from models import User
 from schemas.auth import SignInRequestSchema, SignUpRequestSchema
 from sqlalchemy.exc import IntegrityError, NoResultFound, OperationalError
-from sqlalchemy.ext.asyncio import AsyncSession
 from utils.crypto import get_password_hash, verify_password
 
+from .base import BaseCRUD
 
-class AuthCRUD:
+
+class AuthCRUD(BaseCRUD):
     @classmethod
     async def get_user_id_by_creds(
             cls,
-            db: AsyncSession,
             user_creds: SignInRequestSchema,
     ) -> int | None:
         """Получить идентификатор пользователя по почте и паролю."""
@@ -22,7 +22,7 @@ class AuthCRUD:
             )
         )
         try:
-            res = (await db.execute(select_stmt)).one()
+            res = (await cls.execute(select_stmt)).one()
             is_good_creds: bool = verify_password(user_creds.password, res[1])
             if is_good_creds:
                 return res[0]
@@ -35,7 +35,6 @@ class AuthCRUD:
     @classmethod
     async def sign_up(
             cls,
-            db: AsyncSession,
             user_creds: SignUpRequestSchema,
     ) -> int | None:
         """Добавление в базу нового пользователя."""
@@ -51,8 +50,7 @@ class AuthCRUD:
         )
 
         try:
-            res = (await db.execute(insert_stmt)).scalar()
-            await db.commit()
+            res = (await cls.execute(insert_stmt)).scalar()
             return res
         except IntegrityError:
             return None

@@ -4,15 +4,15 @@ from models import Post
 from schemas.posts import CreatePostRequestSchema, PostResponseItem, UpdatePostRequestSchema
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import NoResultFound, OperationalError
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import func
 
+from .base import BaseCRUD
 
-class PostCRUD:
+
+class PostCRUD(BaseCRUD):
     @classmethod
     async def get_recent_posts(
             cls,
-            db: AsyncSession,
     ) -> list | None:
         """Получить спсиок постов.
 
@@ -25,7 +25,7 @@ class PostCRUD:
         )
 
         try:
-            return await paginate(db, select_stmt)
+            return await paginate(cls.async_session, select_stmt)
         except OperationalError:
             return []
 
@@ -33,7 +33,6 @@ class PostCRUD:
     async def get_post_by_id(
             cls,
             post_id: int,
-            db: AsyncSession,
     ) -> PostResponseItem | None:
         """Получение поста с идентификатором `post_id`."""
         select_stmt = (
@@ -46,7 +45,7 @@ class PostCRUD:
         )
 
         try:
-            res = (await db.execute(select_stmt)).one()
+            res = (await cls.execute(select_stmt)).one()
             return PostResponseItem.parse_obj(dict(zip(Post.get_post_fields_keys(), res)))
         except NoResultFound:
             return None
@@ -56,7 +55,6 @@ class PostCRUD:
     @classmethod
     async def create_post(
             cls,
-            db: AsyncSession,
             new_post_data: CreatePostRequestSchema,
             author_id: int,
     ) -> PostResponseItem | None:
@@ -68,8 +66,7 @@ class PostCRUD:
         )
 
         try:
-            res = (await db.execute(insert_stmt)).one_or_none()
-            await db.commit()
+            res = (await cls.execute(insert_stmt)).one_or_none()
             return PostResponseItem.parse_obj(dict(zip(Post.get_post_fields_keys(), res)))
         except OperationalError:
             return None
@@ -77,7 +74,6 @@ class PostCRUD:
     @classmethod
     async def update_post(
             cls,
-            db: AsyncSession,
             post_id: int,
             author_id: int,
             updated_post: UpdatePostRequestSchema,
@@ -99,8 +95,7 @@ class PostCRUD:
             .returning(*Post.get_post_fields())
         )
         try:
-            res = (await db.execute(update_stmt)).one()
-            await db.commit()
+            res = (await cls.execute(update_stmt)).one()
             return PostResponseItem.parse_obj(dict(zip(Post.get_post_fields_keys(), res)))
         except NoResultFound:
             return None
@@ -112,7 +107,6 @@ class PostCRUD:
             cls,
             post_id: int,
             author_id: int,
-            db: AsyncSession,
     ) -> int:
         """Удалить пост с идентификатором `post_id`.
 
@@ -130,6 +124,5 @@ class PostCRUD:
                 )
             )
         )
-        res = (await db.execute(soft_delete_stmt)).rowcount  # noqa
-        await db.commit()
+        res = (await cls.execute(soft_delete_stmt)).rowcount  # noqa
         return res

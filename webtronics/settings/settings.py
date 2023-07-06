@@ -1,3 +1,4 @@
+import os
 from functools import lru_cache
 
 import pydantic as pd
@@ -20,6 +21,7 @@ def validate_env_var(varname, v):
 
 class Settings(pd.BaseSettings):
     STAGE: Stages = Stages.PROD
+    PROJECT_ROOT: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     # ENVS for connecting to postgres
     POSTGRES_DBNAME: str | None
