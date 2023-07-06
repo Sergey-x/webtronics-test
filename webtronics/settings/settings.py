@@ -35,6 +35,7 @@ class Settings(pd.BaseSettings):
 
     # секрет для генерации JWT
     authjwt_secret_key: str | None = None
+    JWT_HEADER: str = "Authorization"
 
     # ключ доступа для проверки доступности электронной почты пользователя
     NEVERBOUNCE_API_KEY: str | None = None

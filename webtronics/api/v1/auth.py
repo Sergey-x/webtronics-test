@@ -57,6 +57,11 @@ async def sign_up(
         )
 
     new_user_id: int | None = await AuthCRUD.sign_up(user_creds=user_creds)
+    if new_user_id == -1:
+        raise fa.HTTPException(
+            status_code=fa.status.HTTP_400_BAD_REQUEST,
+            detail="Этот email уже есть в системе",
+        )
     if new_user_id is None:
         raise fa.HTTPException(
             status_code=fa.status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -53,6 +53,6 @@ class AuthCRUD(BaseCRUD):
             res = (await cls.execute(insert_stmt)).scalar()
             return res
         except IntegrityError:
-            return None
+            return -1
         except OperationalError:
             return None

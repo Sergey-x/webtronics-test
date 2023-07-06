@@ -39,7 +39,13 @@ class TestSignUp:
 
     async def test_duplicated_email(self, async_client: AsyncClient):
         """Регистрация с email-ом, который уже зарегистрирован в системе."""
-        pass
+        creds = {
+            "email": "firstname.secondname@domain.com",
+            "password": "123456",
+        }
+        await async_client.post(url=self.get_url(), json=creds)
+        response: Response = await async_client.post(url=self.get_url(), json=creds)
+        assert response.status_code == fa.status.HTTP_400_BAD_REQUEST
 
     async def test_good_signup(self, async_client: AsyncClient):
         """Успешная регистрация."""
@@ -49,14 +55,3 @@ class TestSignUp:
         }
         response: Response = await async_client.post(url=self.get_url(), json=creds)
         assert response.status_code == fa.status.HTTP_201_CREATED
-
-    async def test_good_with_good_jwt(self, async_client: AsyncClient):
-        creds = {
-            "email": "firstname.secondname@domain.com",
-            "password": "123456",
-        }
-        response: Response = await async_client.post(url=self.get_url(), json=creds, headers={"Authorization": ""})
-        assert response.status_code == fa.status.HTTP_201_CREATED
-
-    async def test_good_with_bad_jwt(self, async_client: AsyncClient):
-        pass

@@ -9,6 +9,7 @@ from alembic import command as alembic_command
 from alembic.config import Config
 from crud.base import BaseCRUD
 from fastapi import FastAPI
+from fastapi_jwt_auth import AuthJWT
 from httpx import AsyncClient
 from requests import Session as RequestSession
 from sqlalchemy import create_engine
@@ -16,7 +17,9 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from starlette.testclient import TestClient
 from tests import utils as test_utils
 from tests.common import FACTORIES_SESSION, TEST_SETTINGS
+from tests.factories.users import UsersFactory
 from tests.utils import make_alembic_config
+from utils.crypto import get_password_hash
 
 
 @pytest.fixture(scope="session")
@@ -95,3 +98,17 @@ def app() -> FastAPI:
     from main import app as fastapi_app
 
     return fastapi_app
+
+
+@pytest.fixture
+def user_access_token() -> tuple:
+    user = UsersFactory.add(1, "firstname.secondname@domain.com", get_password_hash("password"))
+    access_token = AuthJWT().create_access_token(subject=1)
+    return user, access_token
+
+
+def make_auth_header(token: str) -> dict:
+    headers = {
+        TEST_SETTINGS.JWT_HEADER: f"Bearer {token}",
+    }
+    return headers

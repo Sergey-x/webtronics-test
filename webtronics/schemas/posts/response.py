@@ -10,3 +10,4 @@ class PostResponseItem(pd.BaseModel):
     text: str
     is_available: bool
     author_id: int
+    likes: int
