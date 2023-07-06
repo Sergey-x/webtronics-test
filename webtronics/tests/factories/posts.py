@@ -14,10 +14,10 @@ class PostsFactory(factory.alchemy.SQLAlchemyModelFactory):
     @staticmethod
     def add(
             post_id: int,
-            dt_created: datetime,
-            dt_updated: datetime | None,
-            text: str,
             author_id: int,
+            dt_created: datetime,
+            dt_updated: datetime | None = None,
+            text: str = "content",
             likes: int = 0,
             is_available: bool = True,
     ):

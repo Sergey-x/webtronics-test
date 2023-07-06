@@ -133,8 +133,8 @@ async def add_message(
         fa.status.HTTP_204_NO_CONTENT: {
             "description": "Ok",
         },
-        fa.status.HTTP_400_BAD_REQUEST: {
-            "description": "Bad message id",
+        fa.status.HTTP_404_NOT_FOUND: {
+            "description": "Post with specified id was not found",
         },
         fa.status.HTTP_401_UNAUTHORIZED: {
             "description": "Could not validate credentials",
@@ -151,4 +151,4 @@ async def soft_delete_post(
 
     deleted_row: int = await PostCRUD.delete_post(post_id=post_id, author_id=user_id)
     if deleted_row == 0:
-        raise fa.HTTPException(status_code=fa.status.HTTP_400_BAD_REQUEST, detail="Нет указанного объекта")
+        raise fa.HTTPException(status_code=fa.status.HTTP_404_NOT_FOUND, detail="Нет указанного объекта")
