@@ -115,13 +115,6 @@ def app() -> FastAPI:
 
 
 @pytest.fixture
-def user_access_token() -> tuple:
-    user = UsersFactory.add(1, "firstname.secondname@domain.com", get_password_hash("password"))
-    access_token = AuthJWT().create_access_token(subject=1)
-    return user, access_token
-
-
-@pytest.fixture
 def authed_user() -> AuthedUser:
     user = UsersFactory.add(
         user_id=1,

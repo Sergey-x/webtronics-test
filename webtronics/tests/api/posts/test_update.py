@@ -17,12 +17,14 @@ class TestCreatePost:
             "text": "new content",
         }
 
-    async def test_update_without_content(self, async_client: AsyncClient, user_access_token: tuple[dict, str]):
+    async def test_update_without_content(self, async_client: AsyncClient, authed_user: AuthedUser):
         """Обновление поста с некорректными данными или без них."""
-        user_id: int = user_access_token[0]["id"]
+        user_id: int = authed_user.id
         post = PostsFactory.add(post_id=1, author_id=user_id)
-        response: Response = await async_client.patch(url=self.get_url(post["id"]),
-                                                      headers=make_auth_header(user_access_token[1]))
+        response: Response = await async_client.patch(
+            url=self.get_url(post["id"]),
+            headers=make_auth_header(authed_user.access_token),
+        )
         assert response.status_code == fa.status.HTTP_400_BAD_REQUEST
 
     async def test_update_without_auth_token(self, async_client: AsyncClient):
@@ -30,22 +32,21 @@ class TestCreatePost:
         response: Response = await async_client.patch(url=self.get_url(1), json=self.get_good_post_data())
         assert response.status_code == fa.status.HTTP_401_UNAUTHORIZED
 
-    async def test_good_update(self, async_client: AsyncClient, user_access_token: tuple[dict, str]):
+    async def test_good_update(self, async_client: AsyncClient, authed_user: AuthedUser):
         """Успешное обновление поста."""
-        user_id: int = user_access_token[0]["id"]
-        post = PostsFactory.add(post_id=1, author_id=user_id)
+        post = PostsFactory.add(post_id=1, author_id=authed_user.id)
 
         response: Response = await async_client.patch(
             url=self.get_url(post["id"]),
             json=self.get_good_post_data(),
-            headers=make_auth_header(user_access_token[1]),
+            headers=make_auth_header(authed_user.access_token),
         )
         assert response.status_code == fa.status.HTTP_200_OK
         updated_post: dict = response.json()
 
         # проверяем корректность установленных полей
         assert updated_post["text"] == self.get_good_post_data()["text"]
-        assert updated_post["author_id"] == user_id
+        assert updated_post["author_id"] == authed_user.id
         assert updated_post["is_available"]
         assert updated_post["dt_updated"] is not None
         assert updated_post["dt_created"] is not None
