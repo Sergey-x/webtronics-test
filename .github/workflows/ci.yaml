@@ -67,7 +67,8 @@ jobs:
 
       - name: Test with pytest
         run: |
-          make test-cov
+          coverage run --source=webtronics -m pytest webtronics/
+          coveralls
         env:
           POSTGRES_DBNAME: postgres
           POSTGRES_USER: postgres
