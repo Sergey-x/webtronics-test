@@ -6,6 +6,7 @@ from typing import AsyncGenerator, Generator
 import pydantic as pd
 import pytest
 import pytest_asyncio
+import services
 from alembic import command as alembic_command
 from alembic.config import Config
 from crud.base import BaseCRUD
@@ -19,8 +20,12 @@ from starlette.testclient import TestClient
 from tests import utils as test_utils
 from tests.common import FACTORIES_SESSION, TEST_SETTINGS
 from tests.factories.users import UsersFactory
+from tests.mocks import mock_validate_email
 from tests.utils import make_alembic_config
 from utils.crypto import get_password_hash
+
+
+services.check_email_deliverable = mock_validate_email
 
 
 class AuthedUser(pd.BaseModel):
