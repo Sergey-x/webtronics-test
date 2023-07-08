@@ -43,6 +43,7 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
         run: |
@@ -74,5 +75,3 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           authjwt_secret_key: "CVrOgT6BTdeWmtr"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
