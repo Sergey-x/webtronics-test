@@ -75,3 +75,4 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           authjwt_secret_key: "CVrOgT6BTdeWmtr"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
