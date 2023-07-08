@@ -24,10 +24,8 @@ class PostCRUD(BaseCRUD):
             .order_by(Post.dt_created)
         )
 
-        try:
-            return await paginate(cls.async_session, select_stmt)
-        except OperationalError:
-            return []
+        async with cls.async_session() as ass:
+            return await paginate(ass, select_stmt)
 
     @classmethod
     async def get_post_by_id(

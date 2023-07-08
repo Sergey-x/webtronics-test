@@ -8,7 +8,7 @@ api_router = fa.APIRouter()
 
 
 @api_router.post(
-    "/{post_id}",
+    "/{post_id}/like",
     response_class=ORJSONResponse,
     status_code=fa.status.HTTP_201_CREATED,
     responses={
@@ -28,15 +28,15 @@ async def add_like(
     authorize.jwt_required()
     user_id: int = authorize.get_jwt_subject()
 
-    res = await PostLikeCRUD.add_like(post_id=post_id, user_id=user_id)
-    if res is None:
+    res: int = await PostLikeCRUD.add_like(post_id=post_id, user_id=user_id)
+    if res == 0:
         raise fa.HTTPException(
             status_code=fa.status.HTTP_400_BAD_REQUEST,
         )
 
 
 @api_router.delete(
-    "/{post_id}",
+    "/{post_id}/like",
     response_class=ORJSONResponse,
     status_code=fa.status.HTTP_204_NO_CONTENT,
     responses={
@@ -52,12 +52,12 @@ async def remove_like(
         post_id: int = fa.Path(),
         authorize: AuthJWT = fa.Depends(),
 ):
-    """Убрать лайк с поста с идннтификатором `post_id`."""
+    """Убрать лайк с поста с идентификатором `post_id`."""
     authorize.jwt_required()
     user_id: int = authorize.get_jwt_subject()
 
     res = await PostLikeCRUD.remove_like(post_id=post_id, user_id=user_id)
-    if res == 0 or res is None:
+    if res == 0:
         raise fa.HTTPException(
             status_code=fa.status.HTTP_400_BAD_REQUEST,
         )

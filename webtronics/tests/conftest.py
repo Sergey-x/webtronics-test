@@ -3,6 +3,7 @@ import asyncio
 import os
 from typing import AsyncGenerator, Generator
 
+import pydantic as pd
 import pytest
 import pytest_asyncio
 from alembic import command as alembic_command
@@ -20,6 +21,14 @@ from tests.common import FACTORIES_SESSION, TEST_SETTINGS
 from tests.factories.users import UsersFactory
 from tests.utils import make_alembic_config
 from utils.crypto import get_password_hash
+
+
+class AuthedUser(pd.BaseModel):
+    id: int
+    email: str
+    password: str
+    access_token: str
+    refresh_token: str
 
 
 @pytest.fixture(scope="session")
@@ -105,6 +114,20 @@ def user_access_token() -> tuple:
     user = UsersFactory.add(1, "firstname.secondname@domain.com", get_password_hash("password"))
     access_token = AuthJWT().create_access_token(subject=1)
     return user, access_token
+
+
+@pytest.fixture
+def authed_user() -> AuthedUser:
+    user = UsersFactory.add(
+        user_id=1,
+        email="firstname.secondname@domain.com",
+        password=get_password_hash("password"),
+    )
+    access_token = AuthJWT().create_access_token(subject=1)
+    refresh_token = AuthJWT().create_refresh_token(subject=1)
+
+    user.update({"access_token": access_token, "refresh_token": refresh_token})
+    return AuthedUser.parse_obj(user)
 
 
 def make_auth_header(token: str) -> dict:

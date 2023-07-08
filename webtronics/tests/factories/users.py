@@ -1,6 +1,7 @@
 import factory
 from models import User
 from tests.common import FACTORIES_SESSION
+from utils.crypto import get_password_hash
 
 
 class UsersFactory(factory.alchemy.SQLAlchemyModelFactory):
@@ -10,7 +11,7 @@ class UsersFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session_persistence = "commit"
 
     @staticmethod
-    def add(user_id: int, email: str, password: str):
+    def add(user_id: int, email: str, password: str = get_password_hash("password")):
         UsersFactory(id=user_id, email=email, password=password)
 
         return {

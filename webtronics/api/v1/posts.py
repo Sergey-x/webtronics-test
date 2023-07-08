@@ -31,9 +31,9 @@ api_router = fa.APIRouter()
 )
 async def get_post_by_id(
         post_id: Annotated[int, fa.Path()],
-        authorize: AuthJWT = fa.Depends(),
 ):
     """Получить пост с идентификатором `post_id`."""
+
     post = await PostCRUD.get_post_by_id(post_id=post_id)
 
     if post is None:
@@ -78,6 +78,9 @@ async def get_recent_posts(
         fa.status.HTTP_200_OK: {
             "description": "Ok",
         },
+        fa.status.HTTP_404_NOT_FOUND: {
+            "description": "There is no post with specified id",
+        },
         fa.status.HTTP_401_UNAUTHORIZED: {
             "description": "Could not validate credentials",
         },
@@ -94,7 +97,7 @@ async def update_message(
     updated_post: PostResponseItem | None = await PostCRUD.update_post(post_id=post_id, updated_post=post,
                                                                        author_id=user_id)
     if updated_post is None:
-        raise fa.HTTPException(fa.status.HTTP_400_BAD_REQUEST)
+        raise fa.HTTPException(fa.status.HTTP_404_NOT_FOUND)
     return updated_post
 
 

@@ -15,7 +15,7 @@ class PostsFactory(factory.alchemy.SQLAlchemyModelFactory):
     def add(
             post_id: int,
             author_id: int,
-            dt_created: datetime,
+            dt_created: datetime = datetime.now(),
             dt_updated: datetime | None = None,
             text: str = "content",
             likes: int = 0,
