@@ -52,7 +52,9 @@ jobs:
 
       - name: Make migrations
         run: |
-          alembic upgrade head       
+          cd webtronics
+          alembic upgrade head
+          cd ..
 
       - name: Lint with flake8, isort
         run: |
