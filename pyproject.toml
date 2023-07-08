@@ -21,6 +21,7 @@ neverbounce-sdk = "^4.3.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 aioredis = "^2.0.1"
 httpx = "^0.24.1"
+coveralls = "^3.3.1"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^3.3.2"

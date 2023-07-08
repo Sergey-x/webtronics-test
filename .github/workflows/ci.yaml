@@ -1,6 +1,9 @@
 name: Webtronics_CI
 
 on:
+  push:
+    branches:
+      - 'master'
   pull_request:
     paths:
       - "webtronics/**"
@@ -33,4 +36,4 @@ jobs:
 
       - name: Test with pytest
         run: |
-          make test
+          make test-cov
