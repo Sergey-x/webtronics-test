@@ -32,9 +32,9 @@ API service for posts on Python
 
 ### OpenApi doc:
 #### To see documentation for available endpoints go:
-http://localhost/swagger
+http://localhost:8088/swagger
 
-http://localhost/openapi
+http://localhost:8088/openapi
 
 
 ### Run tests:

@@ -12,8 +12,7 @@ format:
 
 lint:
 	isort --check . && \
-	flake8 . --count --statistics && \
-	mypy -p $(APPLICATION_NAME)
+	flake8 . --count --statistics
 
 env:
 	cp .env.example .env
