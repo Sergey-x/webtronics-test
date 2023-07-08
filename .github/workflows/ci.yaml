@@ -55,6 +55,11 @@ jobs:
           cd webtronics
           alembic upgrade head
           cd ..
+        env:
+          POSTGRES_DBNAME: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          authjwt_secret_key: "CVrOgT6BTdeWmtr"
 
       - name: Lint with flake8, isort
         run: |
