@@ -50,6 +50,10 @@ jobs:
           pip install poetry && poetry config virtualenvs.create false
           poetry install
 
+      - name: Make migrations
+        run: |
+          alembic upgrade head       
+
       - name: Lint with flake8, isort
         run: |
           make lint
