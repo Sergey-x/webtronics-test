@@ -27,7 +27,7 @@ class Settings(pd.BaseSettings):
     POSTGRES_DBNAME: str | None
     POSTGRES_USER: str | None
     POSTGRES_PASSWORD: str | None
-    POSTGRES_HOST: str | None
+    POSTGRES_HOST: str | None = "localhost"
     POSTGRES_PORT: int = 5432
 
     # мимнимальная длина пароля пользователя

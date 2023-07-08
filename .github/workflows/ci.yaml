@@ -37,3 +37,8 @@ jobs:
       - name: Test with pytest
         run: |
           make test-cov
+        env:
+          POSTGRES_DBNAME: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          authjwt_secret_key: "CVrOgT6BTdeWmtr"
