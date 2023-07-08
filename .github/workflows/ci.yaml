@@ -17,6 +17,26 @@ jobs:
       matrix:
         python-version: [ "3.10" ]
 
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:14.2-alpine
+        # Provide the config for postgres
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -38,7 +58,7 @@ jobs:
         run: |
           make test-cov
         env:
-          POSTGRES_DBNAME: test_db
+          POSTGRES_DBNAME: postgres
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: password
+          POSTGRES_PASSWORD: postgres
           authjwt_secret_key: "CVrOgT6BTdeWmtr"
