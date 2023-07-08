@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/Sergey-x/webtronics-test/badge.svg)](https://coveralls.io/github/Sergey-x/webtronics-test)
+
 Webtronics test
 ======================
 
